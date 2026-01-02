@@ -1,4 +1,4 @@
-Summary,Issue Type,Issue ID,Parent,Description
+Summary,Work Type,Issue ID,Parent,Description
 "Epic 1: Course Foundation",Epic,E1,,"PROBLEM: Most teams fail due to bad Git hygiene - direct pushes to main, missing code reviews, no CI gates. APPROACH: Adopt Trunk-Based Development with 3 separate repos (Infra/App/GitOps)."
 "Create 3 production repos (Infra/App/GitOps)",Story,S1.1,E1,"Create techitfactory-infra (Terraform), techitfactory-app (Microservices), techitfactory-gitops (ArgoCD manifests). Each repo needs README with prerequisites."
 "Enforce Trunk-Based Development rules",Story,S1.2,E1,"Configure GitHub branch protections: main protected, PR required, no direct push. Add CODEOWNERS file."

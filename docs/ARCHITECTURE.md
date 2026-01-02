@@ -6,6 +6,87 @@ By the end of this course, you will have built a **production-grade e-commerce p
 
 ---
 
+## Architectural Thinking: Why These Choices?
+
+This section explains the **reasoning** behind each technology decision. In real interviews, you'll be asked "Why did you choose X over Y?"
+
+### Infrastructure Decisions
+
+| Decision | Choice | Why | Alternatives Considered |
+|----------|--------|-----|------------------------|
+| **Cloud Provider** | AWS | Market leader (32%), most job postings, mature EKS | GCP (GKE), Azure (AKS) |
+| **IaC Tool** | Terraform | Cloud-agnostic, industry standard, huge community | Pulumi, CloudFormation, CDK |
+| **Container Orchestration** | EKS (Kubernetes) | Industry standard, portable skills, managed control plane | ECS (AWS-native), Fargate |
+| **Region** | ap-south-1 | Low latency for India, cost-effective | us-east-1 (more services) |
+
+### Networking Decisions
+
+| Decision | Choice | Why | Cost Impact |
+|----------|--------|-----|-------------|
+| **NAT Gateway** | Single (1 AZ) | Cost optimization for learning; prod would use 2 | Saves ~$32/month |
+| **VPC Endpoints** | S3 Gateway | Free, reduces NAT traffic | Saves data transfer costs |
+| **Subnets** | Public + Private | Security best practice; nodes in private | Standard pattern |
+
+### GitOps & Deployment Decisions
+
+| Decision | Choice | Why | Alternatives Considered |
+|----------|--------|-----|------------------------|
+| **GitOps Tool** | ArgoCD | Pull-based, declarative, great UI | FluxCD (lighter), Jenkins X |
+| **Package Manager** | Helm | Industry standard, templating, easy rollback | Kustomize (simpler) |
+| **Registry** | DockerHub | Free tier, public images OK for course | ECR (private, costs more) |
+| **CI Platform** | GitHub Actions | Integrated with GitHub, free for public repos | GitLab CI, CircleCI |
+
+### Observability Decisions
+
+| Decision | Choice | Why | Alternatives Considered |
+|----------|--------|-----|------------------------|
+| **Metrics** | Prometheus | CNCF standard, pull-based, free | Datadog (expensive SaaS) |
+| **Logs** | Loki | Label-based like Prometheus, cost-efficient | ELK (heavy, expensive) |
+| **Dashboards** | Grafana | Works with both Prometheus & Loki | CloudWatch (AWS lock-in) |
+| **Stack Name** | PLG (Prometheus, Loki, Grafana) | Lightweight, open-source, production-proven | ELK, Datadog |
+
+### Application Decisions
+
+| Decision | Choice | Why | Alternatives Considered |
+|----------|--------|-----|------------------------|
+| **Architecture** | Microservices | Real-world pattern, independent scaling | Monolith (simpler) |
+| **Languages** | Node.js + Python | Polyglot = realistic; shows both sync & async | Single language |
+| **Database** | MongoDB | Schema-flexible, easy local setup | PostgreSQL, DynamoDB |
+| **API Style** | REST | Universal, easy to debug | GraphQL, gRPC |
+
+### Security Decisions
+
+| Decision | Choice | Why | Benefit |
+|----------|--------|-----|---------|
+| **CI Auth** | GitHub OIDC | No static AWS keys | Zero secrets in CI |
+| **Human Auth** | AWS SSO | Short-lived tokens | No IAM users |
+| **Pod Identity** | IRSA | Least privilege per pod | No node-level creds |
+| **Image Scanning** | Trivy | Free, fast, OSS | Snyk (paid) |
+| **Code Quality** | SonarCloud | Free for OSS, quality gates | CodeClimate |
+
+### Cost Optimization Decisions
+
+| Decision | Why |
+|----------|-----|
+| **Single NAT** | Learning env doesn't need HA; saves $32/month |
+| **t3.medium nodes** | Burstable, cheap, sufficient for microservices |
+| **S3 Endpoint** | Avoids NAT charges for S3 traffic |
+| **Daily Destroy** | `make down` saves ~$60/month if unused |
+| **Spot Instances** | (Future optimization) Can save 60-90% |
+
+---
+
+### Decision Framework for Any Project
+
+When choosing technologies, ask:
+1. **Is it the industry standard?** → Maximizes job market value
+2. **Is it open-source?** → Avoids vendor lock-in
+3. **Does it have good documentation?** → Faster debugging
+4. **Is there a free tier?** → Important for learning
+5. **Is it portable?** → Skills transfer to other clouds
+
+---
+
 ## High-Level Architecture
 
 ```

@@ -1,85 +1,124 @@
-# Product Backlog
+# Product Backlog (Production-Grade)
 
-Copy these Epics and Stories into your Jira board.
-
----
-
-## Epic 1: Local Development Environment
-**Goal:** Any developer can run the full stack locally in under 5 minutes.
-
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S1.1 | As a developer, I want a single command to start all services | `make local` starts everything | 3 |
-| S1.2 | As a developer, I want health checks for all services | `/health` returns 200 | 2 |
-| S1.3 | As a developer, I want an automated end-to-end test | `scripts/demo.sh` passes | 3 |
+> 10 Epics across 6 Sprints (+ Sprint 0 for Agile Setup)
 
 ---
 
-## Epic 2: Containerization & Registry
-**Goal:** All services are containerized and stored in a private registry.
-
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S2.1 | As a DevOps engineer, I want optimized Dockerfiles | Multi-stage builds, <100MB images | 3 |
-| S2.2 | As a DevOps engineer, I want images pushed to ECR | `make push` succeeds | 3 |
+## Sprint 0: Agile Foundation
+*No code. Jira setup only.*
 
 ---
 
-## Epic 3: Kubernetes (Local)
-**Goal:** The application runs on a local Kubernetes cluster.
+## Sprint 1: Foundation & Infrastructure
 
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S3.1 | As a DevOps engineer, I want a local cluster | Kind cluster created | 2 |
-| S3.2 | As a DevOps engineer, I want deployment manifests | All pods Running | 5 |
-| S3.3 | As a DevOps engineer, I want service exposure | Ingress/Gateway routes traffic | 3 |
+### Epic 1: Course Foundation – Repos, Standards, Trunk-Based Workflow
 
----
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Create 3 repos (Infra/App/GitOps) | Each repo has README, branching model, skeleton | Create infra, app, gitops repo skeletons |
+| Enforce Trunk-Based Development | Branch protection, PR templates, CODEOWNERS | Configure GitHub rules, add templates |
 
-## Epic 4: GitOps & ArgoCD
-**Goal:** Deployments are automated via Git.
+### Epic 2: Terraform Bootstrap – Remote State + IAM + GitHub OIDC
 
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S4.1 | As a DevOps engineer, I want ArgoCD installed | ArgoCD UI accessible | 2 |
-| S4.2 | As a DevOps engineer, I want App-of-Apps | All apps synced | 5 |
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Build bootstrap stack (S3 + DynamoDB + KMS) | Remote state works, idempotent | Implement S3/DynamoDB/KMS Terraform |
+| Configure GitHub OIDC for AWS | No static keys, least-privilege | Create OIDC provider, IAM role |
+| Create Terraform module skeleton | /modules/vpc, /modules/eks exist | Scaffold modules, add CI |
 
----
+### Epic 3: Networking – VPC + Subnets + Single NAT + Endpoints
 
-## Epic 5: AWS Production
-**Goal:** The application runs on AWS EKS.
-
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S5.1 | As a DevOps engineer, I want an EKS cluster | `kubectl get nodes` shows AWS nodes | 5 |
-| S5.2 | As a DevOps engineer, I want GitOps on EKS | ArgoCD deploys to EKS | 5 |
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Provision VPC (multi-AZ, single NAT) | Cost-optimized, 2 AZs, clean destroy | Implement VPC module |
+| Add VPC endpoints (S3 gateway) | Reduce NAT costs, document impact | Add endpoints, measure |
 
 ---
 
-## Epic 6: Observability
-**Goal:** We can monitor and alert on production health.
+## Sprint 2: Platform Setup
 
-### Stories:
-| ID | Story | Acceptance Criteria | Points |
-|----|-------|---------------------|--------|
-| S6.1 | As an SRE, I want Prometheus metrics | `/metrics` scraped | 3 |
-| S6.2 | As an SRE, I want Grafana dashboards | CPU/Memory visible | 3 |
-| S6.3 | As an SRE, I want security scans | Trivy runs on images | 2 |
+### Epic 4: EKS Cluster Baseline – Managed Nodes + Autoscaling + Add-ons
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Provision EKS cluster | Terraform, version pinned, OIDC issuer | EKS module, logging |
+| Configure SSO access | kubectl works with SSO, no static keys | aws-auth mapping, guide |
+| Install Cluster Autoscaler (IRSA) | Scale-out/in verified | IRSA role, deploy autoscaler |
+| Install baseline add-ons | metrics-server, EBS CSI | Add-ons via Terraform |
+
+### Epic 5: Ingress + Domain – ALB Controller + Route53 + TLS
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Install ALB Controller (IRSA) | Test ingress creates ALB | IRSA, install, validate |
+| Configure Route53 + TLS (dev.techitfactory.com) | HTTPS working, smoke test | ACM cert, Route53 record |
 
 ---
 
-## Sprint Allocation
+## Sprint 3: GitOps & Observability
 
-| Sprint | Epics |
-|--------|-------|
-| Sprint 1 | Epic 1 |
-| Sprint 2 | Epic 2 |
-| Sprint 3 | Epic 3 |
-| Sprint 4 | Epic 4 |
-| Sprint 5 | Epic 5 |
-| Sprint 6 | Epic 6 |
+### Epic 6: ArgoCD Production Bootstrap – App-of-Apps
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Install ArgoCD (Helm) | UI accessible via ingress | Helm install, expose |
+| Bootstrap App-of-Apps | GitOps repo syncs automatically | Root app, sync policies |
+| Create Argo Projects (dev/prod) | Blast-radius control | Namespaces, project restrictions |
+
+### Epic 7: Observability – Prometheus + Loki + Grafana
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Deploy kube-prometheus-stack | Grafana accessible, metrics visible | Install, dashboard |
+| Deploy Loki | Logs visible in Grafana | Loki stack, datasource |
+
+---
+
+## Sprint 4: Application Development
+
+### Epic 8: Walking Skeleton App – Polyglot Services + Dockerfiles + Helm
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Create monorepo structure | /services/frontend, product, cart, order | Folder structure, READMEs |
+| Create Dockerfiles | Non-root, multi-stage, <100MB | Dockerfiles, .dockerignore |
+| Create Helm charts | Deployment + Service + probes | Scaffold charts, values |
+| Expose dev entrypoint | dev.techitfactory.com serves frontend | Ingress routes, smoke test |
+
+---
+
+## Sprint 5: CI/CD Pipeline
+
+### Epic 9: GitHub Actions + Dev Auto-Deploy + Prod Promotion
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Per-service GitHub Actions | Lint, test, Trivy scan, push to DockerHub | Workflows per service |
+| Integrate SonarCloud | Quality gates in PR | SonarCloud setup |
+| Dev auto-deploy on merge | GitOps repo updated, ArgoCD syncs | Workflow updates GitOps |
+| Prod promotion via Release/Tag | Manual gate, prod values updated | Release workflow |
+
+---
+
+## Sprint 6: Automation & Polish
+
+### Epic 10: Daily Build & Destroy Automation
+
+| Story | Acceptance Criteria | Tasks |
+|-------|---------------------|-------|
+| Create make up / make down scripts | One-command, idempotent | Orchestration scripts |
+| Capture boot-time metrics (<20 min) | Timed, documented | Timing, optimization doc |
+
+---
+
+## Summary
+
+| Sprint | Epics | Focus |
+|--------|-------|-------|
+| 0 | - | Agile Foundation |
+| 1 | 1, 2, 3 | Repos + Terraform + VPC |
+| 2 | 4, 5 | EKS + Ingress |
+| 3 | 6, 7 | ArgoCD + Observability |
+| 4 | 8 | Application |
+| 5 | 9 | CI/CD |
+| 6 | 10 | Automation |

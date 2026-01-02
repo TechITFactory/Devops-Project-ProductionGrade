@@ -4,45 +4,50 @@
 
 ## About This Project
 
-You have just joined **ShopFast Inc.** as a DevOps Engineer. The company has a working e-commerce application, but it's a mess:
-- No CI/CD
-- No Kubernetes
-- Deployments are manual
-- "It works on my machine" is the motto
-
-**Your mission:** Transform this codebase into a production-ready platform over the next 6 sprints.
+You have just joined **TechIT Factory** as a DevOps Engineer.
+Your mission: Build a production-ready platform on AWS using **Terraform, EKS, ArgoCD, and GitOps**.
 
 ---
 
-## 🏁 Getting Started: Sprint 0
+## 🏁 Sprint Roadmap (7 Sprints)
 
-Before writing any code, we need to set up our Agile workflow.
-
-1. **Read the Agile Guide** → [docs/AGILE_GUIDE.md](docs/AGILE_GUIDE.md)
-2. **Create your Jira Board** → Use the backlog in [docs/BACKLOG.md](docs/BACKLOG.md)
-3. **Understand Definition of Done** → [docs/DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md)
-
----
-
-## Sprint Roadmap
-
-| Sprint | Focus | Status |
-|--------|-------|--------|
-| **0** | Agile Setup & Jira Board | 🟢 Current |
-| **1** | Local Development Environment | 🔒 Locked |
-| **2** | Containerization & Registry | 🔒 Locked |
-| **3** | Kubernetes (Local) | 🔒 Locked |
-| **4** | GitOps & ArgoCD | 🔒 Locked |
-| **5** | AWS Production | 🔒 Locked |
-| **6** | Observability & Day 2 Ops | 🔒 Locked |
+| Sprint | Focus | Epics |
+|--------|-------|-------|
+| **0** | Agile Foundation | Jira setup, backlog |
+| **1** | Repos + Terraform + VPC | 1, 2, 3 |
+| **2** | EKS + Ingress | 4, 5 |
+| **3** | ArgoCD + Observability | 6, 7 |
+| **4** | Application | 8 |
+| **5** | CI/CD | 9 |
+| **6** | Automation | 10 |
 
 ---
 
-## Tech Stack (Coming in Sprint 1+)
+## 📚 Documentation
 
-- **Backend:** Node.js, Python/Flask
-- **Database:** MongoDB
-- **Containers:** Docker
-- **Orchestration:** Kubernetes (EKS)
-- **GitOps:** ArgoCD
+| Doc | Purpose |
+|-----|---------|
+| [AGILE_GUIDE.md](docs/AGILE_GUIDE.md) | Scrum/Kanban primer |
+| [BACKLOG.md](docs/BACKLOG.md) | Epics & Stories for Jira |
+| [REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) | 3-repo model explained |
+| [DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md) | Team standards |
+
+---
+
+## 🛠️ Tech Stack
+
 - **IaC:** Terraform
+- **Cloud:** AWS (VPC, EKS, Route53, ACM)
+- **GitOps:** ArgoCD
+- **Observability:** Prometheus, Loki, Grafana
+- **CI/CD:** GitHub Actions, SonarCloud, Trivy
+- **App:** Node.js, Python, Helm
+
+---
+
+## Current Sprint: 0 (Agile Foundation)
+
+**Tasks:**
+1. Read [AGILE_GUIDE.md](docs/AGILE_GUIDE.md)
+2. Create Jira board from [BACKLOG.md](docs/BACKLOG.md)
+3. Understand [REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md)

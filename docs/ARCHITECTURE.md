@@ -127,7 +127,7 @@ By the end of this course, you will have built a **production-grade e-commerce p
 | **5** | GitHub Actions, SonarCloud, Trivy, Release promotion |
 | **6** | Cost optimization, Automation, Production readiness |
 
----
+----
 
 ## AWS Infrastructure Architecture
 

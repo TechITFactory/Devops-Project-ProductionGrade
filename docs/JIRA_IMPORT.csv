@@ -1,39 +1,39 @@
-Summary,Issue Type,Epic Link,Sprint,Story Points,Description,Acceptance Criteria
-"Epic 1: Course Foundation",Epic,,Sprint 1,,"Repos, Standards, and Trunk-Based Workflow",
-"Create 3 production repos (Infra/App/GitOps)",Story,Epic 1,Sprint 1,3,"Create Infra repo, App monorepo, GitOps repo with baseline docs","Each repo has README, branching model documented"
-"Enforce Trunk-Based Development rules",Story,Epic 1,Sprint 1,2,"Configure GitHub branch protections","main protected, PR required, CODEOWNERS set"
-"Epic 2: Terraform Bootstrap",Epic,,Sprint 1,,"Remote State + IAM + GitHub OIDC",
-"Build bootstrap stack (S3 + DynamoDB + KMS)",Story,Epic 2,Sprint 1,5,"Create Terraform for remote state management","S3 versioned, DynamoDB lock, idempotent"
-"Configure GitHub OIDC for AWS",Story,Epic 2,Sprint 1,3,"No static AWS keys in CI/CD","OIDC provider + least-privilege IAM role"
-"Create Terraform module skeleton",Story,Epic 2,Sprint 1,3,"modules/vpc, modules/eks structure","CI runs fmt/validate/lint"
-"Epic 3: Networking",Epic,,Sprint 1,,"VPC + Subnets + Single NAT + Endpoints",
-"Provision VPC (multi-AZ, single NAT)",Story,Epic 3,Sprint 1,5,"Cost-optimized networking","2 AZs, single NAT, clean destroy"
-"Add VPC endpoints (S3 gateway)",Story,Epic 3,Sprint 1,2,"Reduce NAT costs","S3 gateway endpoint enabled"
-"Epic 4: EKS Cluster Baseline",Epic,,Sprint 2,,"Managed Nodes + Autoscaling + Add-ons",
-"Provision EKS cluster",Story,Epic 4,Sprint 2,5,"Terraform EKS with version pinning","kubectl works with SSO"
-"Configure SSO access",Story,Epic 4,Sprint 2,3,"No long-lived AWS keys for humans","aws-auth mapped to SSO role"
-"Install Cluster Autoscaler (IRSA)",Story,Epic 4,Sprint 2,3,"Scale-out/in verified","IRSA configured"
-"Install baseline add-ons",Story,Epic 4,Sprint 2,2,"metrics-server, EBS CSI","Version pinned"
-"Epic 5: Ingress + Domain",Epic,,Sprint 2,,"ALB Controller + Route53 + TLS",
-"Install ALB Controller (IRSA)",Story,Epic 5,Sprint 2,3,"Ingress creates ALB","IRSA configured"
-"Configure Route53 + TLS",Story,Epic 5,Sprint 2,3,"dev.techitfactory.com with HTTPS","ACM cert, smoke test passes"
-"Epic 6: ArgoCD Bootstrap",Epic,,Sprint 3,,"App-of-Apps pattern",
-"Install ArgoCD (Helm)",Story,Epic 6,Sprint 3,3,"UI accessible via ingress","Version pinned"
-"Bootstrap App-of-Apps",Story,Epic 6,Sprint 3,5,"GitOps repo syncs automatically","Root app + child apps"
-"Create Argo Projects (dev/prod)",Story,Epic 6,Sprint 3,2,"Blast-radius control","Namespaces + restrictions"
-"Epic 7: Observability",Epic,,Sprint 3,,"Prometheus + Loki + Grafana",
-"Deploy kube-prometheus-stack",Story,Epic 7,Sprint 3,3,"Grafana accessible, metrics visible","Dashboard shows node/pod metrics"
-"Deploy Loki",Story,Epic 7,Sprint 3,3,"Logs visible in Grafana","Loki datasource configured"
-"Epic 8: Walking Skeleton App",Epic,,Sprint 4,,"Polyglot Services + Dockerfiles + Helm",
-"Create monorepo structure",Story,Epic 8,Sprint 4,3,"/services/frontend, product, cart, order","/health and /ready endpoints"
-"Create Dockerfiles",Story,Epic 8,Sprint 4,3,"Non-root, multi-stage","<100MB images"
-"Create Helm charts",Story,Epic 8,Sprint 4,5,"Deployment + Service + probes","ArgoCD deploys to dev"
-"Expose dev entrypoint",Story,Epic 8,Sprint 4,2,"dev.techitfactory.com serves frontend","Smoke test passes"
-"Epic 9: CI/CD",Epic,,Sprint 5,,"GitHub Actions + Dev Auto-Deploy + Prod Promotion",
-"Per-service GitHub Actions",Story,Epic 9,Sprint 5,5,"Lint, test, Trivy scan, push","DockerHub push works"
-"Integrate SonarCloud",Story,Epic 9,Sprint 5,3,"Quality gates in PR","SonarCloud connected"
-"Dev auto-deploy on merge",Story,Epic 9,Sprint 5,5,"GitOps repo updated, ArgoCD syncs","Traceability documented"
-"Prod promotion via Release/Tag",Story,Epic 9,Sprint 5,3,"Manual gate for prod","Release workflow updates prod"
-"Epic 10: Daily Build & Destroy",Epic,,Sprint 6,,"One-command Up/Down + <20 min target",
-"Create make up/down scripts",Story,Epic 10,Sprint 6,5,"One-command, idempotent","VPC→EKS→ArgoCD in one command"
-"Capture boot-time metrics",Story,Epic 10,Sprint 6,3,"<20 min target","Timing logged per stage"
+Issue ID,Summary,Issue Type,Parent,Sprint,Story Points,Description,Acceptance Criteria
+E1,"Epic 1: Course Foundation",Epic,,Sprint 1,,"Repos, Standards, and Trunk-Based Workflow",
+S1.1,"Create 3 production repos (Infra/App/GitOps)",Story,E1,Sprint 1,3,"Create Infra repo, App monorepo, GitOps repo with baseline docs","Each repo has README, branching model documented"
+S1.2,"Enforce Trunk-Based Development rules",Story,E1,Sprint 1,2,"Configure GitHub branch protections","main protected, PR required, CODEOWNERS set"
+E2,"Epic 2: Terraform Bootstrap",Epic,,Sprint 1,,"Remote State + IAM + GitHub OIDC",
+S2.1,"Build bootstrap stack (S3 + DynamoDB + KMS)",Story,E2,Sprint 1,5,"Create Terraform for remote state management","S3 versioned, DynamoDB lock, idempotent"
+S2.2,"Configure GitHub OIDC for AWS",Story,E2,Sprint 1,3,"No static AWS keys in CI/CD","OIDC provider + least-privilege IAM role"
+S2.3,"Create Terraform module skeleton",Story,E2,Sprint 1,3,"modules/vpc, modules/eks structure","CI runs fmt/validate/lint"
+E3,"Epic 3: Networking",Epic,,Sprint 1,,"VPC + Subnets + Single NAT + Endpoints",
+S3.1,"Provision VPC (multi-AZ, single NAT)",Story,E3,Sprint 1,5,"Cost-optimized networking","2 AZs, single NAT, clean destroy"
+S3.2,"Add VPC endpoints (S3 gateway)",Story,E3,Sprint 1,2,"Reduce NAT costs","S3 gateway endpoint enabled"
+E4,"Epic 4: EKS Cluster Baseline",Epic,,Sprint 2,,"Managed Nodes + Autoscaling + Add-ons",
+S4.1,"Provision EKS cluster",Story,E4,Sprint 2,5,"Terraform EKS with version pinning","kubectl works with SSO"
+S4.2,"Configure SSO access",Story,E4,Sprint 2,3,"No long-lived AWS keys for humans","aws-auth mapped to SSO role"
+S4.3,"Install Cluster Autoscaler (IRSA)",Story,E4,Sprint 2,3,"Scale-out/in verified","IRSA configured"
+S4.4,"Install baseline add-ons",Story,E4,Sprint 2,2,"metrics-server, EBS CSI","Version pinned"
+E5,"Epic 5: Ingress + Domain",Epic,,Sprint 2,,"ALB Controller + Route53 + TLS",
+S5.1,"Install ALB Controller (IRSA)",Story,E5,Sprint 2,3,"Ingress creates ALB","IRSA configured"
+S5.2,"Configure Route53 + TLS",Story,E5,Sprint 2,3,"dev.techitfactory.com with HTTPS","ACM cert, smoke test passes"
+E6,"Epic 6: ArgoCD Bootstrap",Epic,,Sprint 3,,"App-of-Apps pattern",
+S6.1,"Install ArgoCD (Helm)",Story,E6,Sprint 3,3,"UI accessible via ingress","Version pinned"
+S6.2,"Bootstrap App-of-Apps",Story,E6,Sprint 3,5,"GitOps repo syncs automatically","Root app + child apps"
+S6.3,"Create Argo Projects (dev/prod)",Story,E6,Sprint 3,2,"Blast-radius control","Namespaces + restrictions"
+E7,"Epic 7: Observability",Epic,,Sprint 3,,"Prometheus + Loki + Grafana",
+S7.1,"Deploy kube-prometheus-stack",Story,E7,Sprint 3,3,"Grafana accessible, metrics visible","Dashboard shows node/pod metrics"
+S7.2,"Deploy Loki",Story,E7,Sprint 3,3,"Logs visible in Grafana","Loki datasource configured"
+E8,"Epic 8: Walking Skeleton App",Epic,,Sprint 4,,"Polyglot Services + Dockerfiles + Helm",
+S8.1,"Create monorepo structure",Story,E8,Sprint 4,3,"/services/frontend, product, cart, order","/health and /ready endpoints"
+S8.2,"Create Dockerfiles",Story,E8,Sprint 4,3,"Non-root, multi-stage","<100MB images"
+S8.3,"Create Helm charts",Story,E8,Sprint 4,5,"Deployment + Service + probes","ArgoCD deploys to dev"
+S8.4,"Expose dev entrypoint",Story,E8,Sprint 4,2,"dev.techitfactory.com serves frontend","Smoke test passes"
+E9,"Epic 9: CI/CD",Epic,,Sprint 5,,"GitHub Actions + Dev Auto-Deploy + Prod Promotion",
+S9.1,"Per-service GitHub Actions",Story,E9,Sprint 5,5,"Lint, test, Trivy scan, push","DockerHub push works"
+S9.2,"Integrate SonarCloud",Story,E9,Sprint 5,3,"Quality gates in PR","SonarCloud connected"
+S9.3,"Dev auto-deploy on merge",Story,E9,Sprint 5,5,"GitOps repo updated, ArgoCD syncs","Traceability documented"
+S9.4,"Prod promotion via Release/Tag",Story,E9,Sprint 5,3,"Manual gate for prod","Release workflow updates prod"
+E10,"Epic 10: Daily Build & Destroy",Epic,,Sprint 6,,"One-command Up/Down + <20 min target",
+S10.1,"Create make up/down scripts",Story,E10,Sprint 6,5,"One-command, idempotent","VPC→EKS→ArgoCD in one command"
+S10.2,"Capture boot-time metrics",Story,E10,Sprint 6,3,"<20 min target","Timing logged per stage"

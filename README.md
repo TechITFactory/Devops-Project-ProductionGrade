@@ -27,10 +27,13 @@ Your mission: Build a production-ready platform on AWS using **Terraform, EKS, A
 
 | Doc | Purpose |
 |-----|---------|
+| [PREREQUISITES.md](docs/PREREQUISITES.md) | Required tools, accounts, AWS costs |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System diagrams, what you'll build |
 | [AGILE_GUIDE.md](docs/AGILE_GUIDE.md) | Scrum/Kanban primer |
 | [BACKLOG.md](docs/BACKLOG.md) | Epics & Stories for Jira |
 | [REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) | 3-repo model explained |
 | [DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md) | Team standards |
+| [JIRA_IMPORT.csv](docs/JIRA_IMPORT.csv) | CSV to import into Jira |
 
 ---
 

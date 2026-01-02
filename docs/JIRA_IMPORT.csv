@@ -1,121 +1,39 @@
-Issue ID,Summary,Issue Type,Parent,Sprint,Story Points,Description,Acceptance Criteria
-E1,"Epic 1: Course Foundation",Epic,,Sprint 1,,"PROBLEM: Most teams fail due to bad Git hygiene - direct pushes to main, missing code reviews, no CI gates. APPROACH: Adopt Trunk-Based Development with 3 separate repos (Infra/App/GitOps) for separation of concerns, proper permissions, and clean GitOps.",
-S1.1,"Create 3 production repos (Infra/App/GitOps)",Story,E1,Sprint 1,3,"Create techitfactory-infra (Terraform), techitfactory-app (Microservices), techitfactory-gitops (ArgoCD manifests). Each repo needs README with prerequisites, local run instructions, and deploy flow. Establish naming conventions and Trunk-Based branching model.","- Infra repo exists with /bootstrap and /modules skeleton
-- App monorepo exists with /services/* structure
-- GitOps repo exists with App-of-Apps layout
-- Each repo has README documenting the workflow"
-S1.2,"Enforce Trunk-Based Development rules",Story,E1,Sprint 1,2,"Configure GitHub branch protections: main protected, PR required, no direct push, no force push. Add required status checks for lint/test/scan. Create PR templates and CODEOWNERS file. Document tag/release conventions for dev→prod promotion.","- main branch protected with PR requirement
-- Required checks enabled
-- PR template and CODEOWNERS exist
-- Release/tag conventions documented"
-E2,"Epic 2: Terraform Bootstrap",Epic,,Sprint 1,,"PROBLEM: Two engineers running terraform apply simultaneously can corrupt state. AWS keys in GitHub = security risk. APPROACH: Remote state in S3 with DynamoDB locking + GitHub OIDC for zero static credentials.",
-S2.1,"Build bootstrap stack (S3 + DynamoDB + KMS)",Story,E2,Sprint 1,5,"Create Terraform bootstrap that provisions: S3 bucket (versioned, encrypted), DynamoDB table (state locking), KMS key (encryption). Must be idempotent - running twice should not create drift. Document what to keep vs destroy.","- S3 bucket created with versioning + encryption
-- DynamoDB lock table created and working
-- terraform init with remote backend succeeds
-- Bootstrap is idempotent (re-run safe)"
-S2.2,"Configure GitHub OIDC for AWS",Story,E2,Sprint 1,3,"Create AWS IAM OIDC provider for GitHub. Create least-privilege IAM role with trust policy for GitHub Actions. Workflow should run terraform init/plan using OIDC (no static AWS_ACCESS_KEY). Document OIDC security benefits.","- OIDC provider created in AWS
-- IAM role with scoped policies created
-- GitHub workflow assumes role successfully
-- No static AWS keys anywhere"
-S2.3,"Create Terraform module skeleton",Story,E2,Sprint 1,3,"Create module structure: modules/vpc, modules/eks, modules/platform-bootstrap. Root stacks follow naming, tagging conventions. CI runs terraform fmt + validate + tflint. Define outputs for cluster and ingress targets.","- Module structure exists
-- Root stacks follow conventions
-- CI validates Terraform code
-- Standard outputs defined"
-E3,"Epic 3: Networking",Epic,,Sprint 1,,"PROBLEM: Poor VPC design wastes money and creates security holes. NAT per AZ = $96/month wasted. Public subnets for workers = risk. APPROACH: Cost-optimized VPC with single NAT (learning env) and S3 endpoint.",
-S3.1,"Provision VPC (multi-AZ, single NAT)",Story,E3,Sprint 1,5,"Create VPC in ap-south-1 with 2 AZs. Public subnets (10.0.1.0/24, 10.0.2.0/24) for ALB. Private subnets (10.0.10.0/24, 10.0.20.0/24) for EKS workers. Single NAT gateway in AZ-A (cost optimization). Standard tags: owner, env, cost, project.","- VPC created with correct CIDR
-- 2 AZs with public/private subnets
-- Single NAT gateway (cost-optimized)
-- Destroy removes all resources cleanly"
-S3.2,"Add VPC endpoints (S3 gateway)",Story,E3,Sprint 1,2,"Add S3 Gateway endpoint to private subnets (free, reduces NAT traffic). Document measurable cost/time impact. Consider interface endpoints for ECR if needed.","- S3 gateway endpoint enabled
-- NAT traffic reduced (measurable)
-- Cost savings documented"
-E4,"Epic 4: EKS Cluster Baseline",Epic,,Sprint 2,,"PROBLEM: Self-managed K8s requires patching, upgrades, HA management - too much overhead. APPROACH: Use EKS (managed control plane) with Managed Node Groups. Key pattern: IRSA for pod-level IAM (not node-level).",
-S4.1,"Provision EKS cluster",Story,E4,Sprint 2,5,"Create EKS cluster via Terraform with version pinning (1.28+). Enable Managed Node Group (min:1, desired:2, max:4, t3.medium). Configure cluster logging. Ensure OIDC issuer URL is available for IRSA.","- EKS cluster created via Terraform
-- Managed node group running
-- Cluster logging enabled
-- OIDC issuer output available"
-S4.2,"Configure SSO access",Story,E4,Sprint 2,3,"Map AWS SSO role to Kubernetes RBAC (admin). Document steps for students: aws sso login → update kubeconfig → kubectl get nodes. No long-lived AWS keys for human access. Include troubleshooting section.","- SSO role mapped to K8s admin
-- kubectl works after SSO login
-- No static AWS keys for humans
-- Troubleshooting guide included"
-S4.3,"Install Cluster Autoscaler (IRSA)",Story,E4,Sprint 2,3,"Deploy Cluster Autoscaler with IRSA (not node IAM role). Configure nodegroup discovery via tags. Test scale-out: deploy high-replica workload, verify new node appears. Test scale-in: reduce replicas, verify node terminates.","- Autoscaler deployed successfully
-- IRSA configured (no node creds)
-- Scale-out test passes
-- Scale-in test passes"
-S4.4,"Install baseline add-ons",Story,E4,Sprint 2,2,"Install via Terraform: metrics-server (for HPA), EBS CSI driver (for PVCs). All add-ons version-pinned. Create health verification checklist. Add-ons removed cleanly on destroy.","- metrics-server working
-- EBS CSI driver installed
-- Version pinned in code
-- Destroy removes add-ons"
-E5,"Epic 5: Ingress + Domain",Epic,,Sprint 2,,"PROBLEM: K8s Services are internal by default. Need external access, HTTPS, custom domain. APPROACH: AWS Load Balancer Controller (creates ALB), ACM certificate (free TLS), Route53 (DNS).",
-S5.1,"Install ALB Controller (IRSA)",Story,E5,Sprint 2,3,"Deploy AWS Load Balancer Controller with IRSA. Verify by creating test Ingress - should auto-create ALB in AWS Console. Document standard ingress annotations for the course. Ensure ALB removed on Ingress deletion.","- Controller installed successfully
-- IRSA verified
-- Test Ingress creates ALB
-- Ingress annotations documented"
-S5.2,"Configure Route53 + TLS",Story,E5,Sprint 2,3,"Create ACM certificate for *.techitfactory.com (or dev.techitfactory.com). Create Route53 A record pointing to ALB. Verify end-to-end: curl https://dev.techitfactory.com returns 200. Document teardown for build/destroy cycle.","- DNS record created
-- TLS working end-to-end
-- Smoke test passes
-- Teardown documented"
-E6,"Epic 6: ArgoCD Bootstrap",Epic,,Sprint 3,,"PROBLEM: Manual kubectl apply is error-prone and unauditable. Who deployed? When? How to rollback? APPROACH: GitOps with ArgoCD. Git = single source of truth. Cluster pulls state from Git. App-of-Apps pattern for scalability.",
-S6.1,"Install ArgoCD (Helm)",Story,E6,Sprint 3,3,"Install ArgoCD in argocd namespace via Helm. Expose UI through ingress. Admin secret stored securely (not in Git). Version pinned. Document ArgoCD components and basic hardening.","- ArgoCD installed via Helm
-- UI accessible via ingress
-- Admin access secure
-- Version pinned"
-S6.2,"Bootstrap App-of-Apps",Story,E6,Sprint 3,5,"Create root Application (platform-root) that points to GitOps repo /apps folder. Child apps auto-sync from GitOps repo. Dev uses auto-sync; prod is manual. Demo: empty cluster → running platform apps in one click.","- Root app created
-- Child apps sync automatically
-- Dev auto-sync / prod manual
-- Demo script works"
-S6.3,"Create Argo Projects (dev/prod)",Story,E6,Sprint 3,2,"Create dev and prod namespaces. Create Argo Projects that restrict: destinations (dev apps only to dev namespace), sources (only from GitOps repo). Document why Projects prevent accidental prod deploys.","- dev/prod namespaces exist
-- Argo Projects restrict destinations
-- Blast-radius control documented"
-E7,"Epic 7: Observability",Epic,,Sprint 3,,"PROBLEM: 'The app is slow' is not actionable. Need metrics (CPU, latency, errors), logs (structured, searchable), dashboards (visual, alertable). APPROACH: PLG stack (Prometheus, Loki, Grafana) - lightweight, open-source, production-proven.",
-S7.1,"Deploy kube-prometheus-stack",Story,E7,Sprint 3,3,"Deploy kube-prometheus-stack via GitOps (Helm release in GitOps repo). Expose Grafana via ingress. Verify: at least one dashboard shows node/pod metrics. Document troubleshooting: targets down, scrape errors.","- Prometheus scraping metrics
-- Grafana accessible via ingress
-- Dashboards showing data
-- Troubleshooting guide included"
-S7.2,"Deploy Loki",Story,E7,Sprint 3,3,"Deploy Loki stack (Loki + log collector). Configure Grafana datasource for Loki. Verify: logs visible for microservice pods and ArgoCD. Document debug workflow: metrics → logs → pod.","- Loki receiving logs
-- Grafana Loki datasource configured
-- Logs visible in Grafana
-- Debug workflow documented"
-E8,"Epic 8: Walking Skeleton App",Epic,,Sprint 4,,"PROBLEM: Platform is ready but empty. Need an application to validate the entire flow. APPROACH: Walking Skeleton - minimal end-to-end working system. 4 polyglot services (Node.js + Python). Every service: /health, /ready, non-root, multi-stage Dockerfile.",
-S8.1,"Create monorepo structure",Story,E8,Sprint 4,3,"Create /services/frontend, /services/product, /services/cart, /services/order. Each service exposes /health (liveness) and /ready (readiness). Logs to stdout in consistent JSON format. Config via env vars (PORT, LOG_LEVEL, MONGO_URL).","- Service folders exist
-- /health and /ready work
-- Logs to stdout
-- Config via env vars"
-S8.2,"Create Dockerfiles",Story,E8,Sprint 4,3,"Multi-stage Dockerfiles: builder stage (npm ci), runtime stage (alpine, non-root user). Add .dockerignore. Verify: docker run + curl /health returns 200. Tagging scheme: service:git-sha. Target: <100MB images.","- Docker build succeeds
-- Non-root user
-- <100MB images
-- Local run works"
-S8.3,"Create Helm charts",Story,E8,Sprint 4,5,"Each service gets Helm chart: Deployment, Service, probes (liveness→/health, readiness→/ready). Set requests/limits (baseline). values.yaml, values-dev.yaml, values-prod.yaml. ArgoCD deploys to dev namespace.","- Helm charts with Deployment+Service
-- Probes configured
-- Resources set
-- ArgoCD deploy works"
-S8.4,"Expose dev entrypoint",Story,E8,Sprint 4,2,"Create ingress routes: dev.techitfactory.com → frontend, /api/products → product-service, /api/cart → cart-service, /api/orders → order-service. Write smoke test script (curl checks). Verify in Grafana: metrics + logs for requests.","- Frontend accessible
-- API routes work
-- Smoke test script exists
-- Observability verified"
-E9,"Epic 9: CI/CD",Epic,,Sprint 5,,"PROBLEM: Manual build/deploy doesn't scale. Need: automated builds on PR, security scanning before merge, auto-deploy to dev, controlled promotion to prod. APPROACH: GitHub Actions + SonarCloud (quality) + Trivy (security) + GitOps (deploy).",
-S9.1,"Per-service GitHub Actions",Story,E9,Sprint 5,5,"Each service gets workflow under .github/workflows. On PR: lint + unit tests. On merge: docker build, Trivy scan (CRITICAL=fail), push to DockerHub. DockerHub creds in GitHub secrets. Logs should be course-friendly.","- Per-service workflows exist
-- PR triggers lint/test
-- Merge triggers build/scan/push
-- Clear, readable logs"
-S9.2,"Integrate SonarCloud",Story,E9,Sprint 5,3,"Connect SonarCloud to GitHub repo. Run analysis on PR. Quality gate status visible in PR checks. Document policy: block merge or warn. Include demo: failing rule → fix → passing.","- SonarCloud connected
-- Quality gate in PR
-- Policy documented
-- Demo scenario works"
-S9.3,"Dev auto-deploy on merge",Story,E9,Sprint 5,5,"Merge to main triggers: update GitOps repo dev values with new image tag. ArgoCD auto-syncs to dev namespace. Document traceability: commit SHA → image tag → running pod. Document rollback: revert GitOps commit.","- Merge updates GitOps repo
-- ArgoCD auto-syncs
-- Traceability documented
-- Rollback documented"
-S9.4,"Prod promotion via Release/Tag",Story,E9,Sprint 5,3,"GitHub Release/Tag triggers promotion workflow. Workflow updates GitOps prod values. ArgoCD syncs to prod (manual sync policy). Create release notes template. Document post-deploy smoke test.","- Release triggers workflow
-- Prod values updated
-- Manual sync to prod
-- Release template exists"
-E10,"Epic 10: Daily Build & Destroy",Epic,,Sprint 6,,"PROBLEM: AWS bills add up. Running EKS costs ~$72/month when idle. APPROACH: One-command make up / make down for daily build/destroy cycle. Target: <20 min from make up to working Grafana. Idempotent scripts.",
-S10.1,"Create make up/down scripts",Story,E10,Sprint 6,5,"make up: VPC → EKS → add-ons → ArgoCD → GitOps sync (full platform). make down: destroy all resources cleanly. Scripts must be idempotent (safe to re-run). Include verification steps: no orphaned ALB, NAT, EIP, ENI.","- make up provisions everything
-- make down destroys everything
-- Idempotent (safe to re-run)
-- Cleanup verification included"
-S10.2,"Capture boot-time metrics",Story,E10,Sprint 6,3,"Add timestamps to each stage of make up. End-of-sprint demo with real boot-time measurement. Document top 5 optimization levers (node size, add-ons, endpoints). Capture known bottlenecks for future optimization.","- Terraform steps timed
-- Boot time measured (<20 min target)
-- Optimization checklist documented
-- Students can reproduce timing"
+Summary,Issue Type,Issue ID,Parent,Description
+"Epic 1: Course Foundation",Epic,E1,,"PROBLEM: Most teams fail due to bad Git hygiene - direct pushes to main, missing code reviews, no CI gates. APPROACH: Adopt Trunk-Based Development with 3 separate repos (Infra/App/GitOps)."
+"Create 3 production repos (Infra/App/GitOps)",Story,S1.1,E1,"Create techitfactory-infra (Terraform), techitfactory-app (Microservices), techitfactory-gitops (ArgoCD manifests). Each repo needs README with prerequisites."
+"Enforce Trunk-Based Development rules",Story,S1.2,E1,"Configure GitHub branch protections: main protected, PR required, no direct push. Add CODEOWNERS file."
+"Epic 2: Terraform Bootstrap",Epic,E2,,"PROBLEM: Two engineers running terraform apply can corrupt state. AWS keys in GitHub = security risk. APPROACH: Remote state in S3 + GitHub OIDC."
+"Build bootstrap stack (S3 + DynamoDB + KMS)",Story,S2.1,E2,"Create Terraform for S3 bucket (versioned), DynamoDB table (locking), KMS key. Must be idempotent."
+"Configure GitHub OIDC for AWS",Story,S2.2,E2,"Create AWS IAM OIDC provider for GitHub. No static AWS keys anywhere."
+"Create Terraform module skeleton",Story,S2.3,E2,"Create modules/vpc, modules/eks. CI runs terraform fmt + validate."
+"Epic 3: Networking",Epic,E3,,"PROBLEM: Poor VPC design wastes money. NAT per AZ = $96/month wasted. APPROACH: Single NAT + S3 endpoint."
+"Provision VPC (multi-AZ, single NAT)",Story,S3.1,E3,"Create VPC in ap-south-1 with 2 AZs. Single NAT gateway (cost optimization)."
+"Add VPC endpoints (S3 gateway)",Story,S3.2,E3,"Add S3 Gateway endpoint. Document cost savings."
+"Epic 4: EKS Cluster Baseline",Epic,E4,,"PROBLEM: Self-managed K8s requires too much overhead. APPROACH: EKS + IRSA for pod-level IAM."
+"Provision EKS cluster",Story,S4.1,E4,"Create EKS via Terraform with version pinning. Enable Managed Node Group."
+"Configure SSO access",Story,S4.2,E4,"Map AWS SSO role to K8s RBAC. No static AWS keys for humans."
+"Install Cluster Autoscaler (IRSA)",Story,S4.3,E4,"Deploy Cluster Autoscaler with IRSA. Test scale-out/in."
+"Install baseline add-ons",Story,S4.4,E4,"Install metrics-server, EBS CSI driver via Terraform."
+"Epic 5: Ingress + Domain",Epic,E5,,"PROBLEM: K8s Services are internal. Need HTTPS + custom domain. APPROACH: ALB Controller + ACM + Route53."
+"Install ALB Controller (IRSA)",Story,S5.1,E5,"Deploy AWS LB Controller. Verify Ingress creates ALB."
+"Configure Route53 + TLS",Story,S5.2,E5,"ACM cert for techitfactory.com. Route53 A record. Verify HTTPS works."
+"Epic 6: ArgoCD Bootstrap",Epic,E6,,"PROBLEM: Manual kubectl is unauditable. APPROACH: GitOps with ArgoCD. App-of-Apps pattern."
+"Install ArgoCD (Helm)",Story,S6.1,E6,"Install ArgoCD via Helm. Expose UI via ingress."
+"Bootstrap App-of-Apps",Story,S6.2,E6,"Create root Application pointing to GitOps repo. Child apps auto-sync."
+"Create Argo Projects (dev/prod)",Story,S6.3,E6,"Create namespaces and Argo Projects with blast-radius control."
+"Epic 7: Observability",Epic,E7,,"PROBLEM: Need metrics, logs, dashboards. APPROACH: PLG stack (Prometheus, Loki, Grafana)."
+"Deploy kube-prometheus-stack",Story,S7.1,E7,"Deploy via GitOps. Expose Grafana via ingress."
+"Deploy Loki",Story,S7.2,E7,"Deploy Loki. Configure Grafana datasource."
+"Epic 8: Walking Skeleton App",Epic,E8,,"PROBLEM: Platform is empty. APPROACH: 4 polyglot services - /health, /ready, non-root Docker, Helm."
+"Create monorepo structure",Story,S8.1,E8,"Create /services/frontend, product, cart, order with health endpoints."
+"Create Dockerfiles",Story,S8.2,E8,"Multi-stage, non-root, <100MB images."
+"Create Helm charts",Story,S8.3,E8,"Deployment + Service + probes for each service."
+"Expose dev entrypoint",Story,S8.4,E8,"Ingress routes for frontend and APIs. Smoke test."
+"Epic 9: CI/CD",Epic,E9,,"PROBLEM: Manual build doesn't scale. APPROACH: GitHub Actions + SonarCloud + Trivy + GitOps."
+"Per-service GitHub Actions",Story,S9.1,E9,"Workflows for lint, test, Trivy scan, DockerHub push."
+"Integrate SonarCloud",Story,S9.2,E9,"Quality gates in PR. Document policy."
+"Dev auto-deploy on merge",Story,S9.3,E9,"Merge to main updates GitOps repo. ArgoCD auto-syncs."
+"Prod promotion via Release/Tag",Story,S9.4,E9,"GitHub Release triggers prod deployment."
+"Epic 10: Daily Build & Destroy",Epic,E10,,"PROBLEM: AWS costs add up. APPROACH: One-command make up/down. <20 min target."
+"Create make up/down scripts",Story,S10.1,E10,"Idempotent scripts for full platform lifecycle."
+"Capture boot-time metrics",Story,S10.2,E10,"Time each stage. Document optimization levers."

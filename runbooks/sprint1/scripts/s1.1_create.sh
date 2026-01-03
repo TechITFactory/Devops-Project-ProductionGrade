@@ -21,6 +21,10 @@ mkdir -p techitfactory-infra
 cd techitfactory-infra
 git init
 
+# Set author to TechITFactory (not personal name)
+git config user.name "TechITFactory"
+git config user.email "admin@techitfactory.com"
+
 # Folder structure
 mkdir -p bootstrap
 mkdir -p modules/vpc
@@ -86,6 +90,10 @@ echo "=== Creating techitfactory-app ==="
 mkdir -p techitfactory-app
 cd techitfactory-app
 git init
+
+# Set author to TechITFactory (not personal name)
+git config user.name "TechITFactory"
+git config user.email "admin@techitfactory.com"
 
 # Folder structure
 mkdir -p services/frontend
@@ -160,6 +168,10 @@ echo "=== Creating techitfactory-gitops ==="
 mkdir -p techitfactory-gitops
 cd techitfactory-gitops
 git init
+
+# Set author to TechITFactory (not personal name)
+git config user.name "TechITFactory"
+git config user.email "admin@techitfactory.com"
 
 # Folder structure
 mkdir -p apps/platform
